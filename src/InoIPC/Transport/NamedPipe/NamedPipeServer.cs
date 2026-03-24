@@ -17,7 +17,7 @@ namespace InoIPC
 
       private readonly string pipeName;
 
-      private volatile bool running;
+      private CancellationTokenSource cts;
 
    #endregion
 
@@ -40,19 +40,21 @@ namespace InoIPC
       // ----------------------------------------------------------------------
       public void Start(Action<IpcConnection> onClient)
       {
-         running = true;
+         cts = new CancellationTokenSource();
 
-         while (running)
+         while (!cts.IsCancellationRequested)
          {
+            NamedPipeServerStream server = null;
+
             try
             {
-               var server = new NamedPipeServerStream
+               server = new NamedPipeServerStream
                (
                   pipeName, PipeDirection.InOut,
                   NamedPipeServerStream.MaxAllowedServerInstances
                );
 
-               server.WaitForConnection();
+               server.WaitForConnectionAsync(cts.Token).Wait();
 
                var transport = new NamedPipeTransport(server);
 
@@ -67,25 +69,33 @@ namespace InoIPC
                   }
                );
             }
-            catch (ObjectDisposedException)
+            catch (OperationCanceledException)
             {
+               server?.Dispose();
+               break;
+            }
+            catch (AggregateException ex) when (ex.InnerException is OperationCanceledException)
+            {
+               server?.Dispose();
                break;
             }
             catch (IOException)
             {
-               if (!running) { break; }
+               server?.Dispose();
+
+               if (cts.IsCancellationRequested) { break; }
             }
          }
       }
 
       // ------------------------------------------------------------
       /// <summary>
-      /// Stops the server.
+      /// Stops the server by cancelling the accept loop.
       /// </summary>
       // ------------------------------------------------------------
       public void Stop()
       {
-         running = false;
+         cts?.Cancel();
       }
 
    #endregion
@@ -95,6 +105,7 @@ namespace InoIPC
       public void Dispose()
       {
          Stop();
+         cts?.Dispose();
       }
 
    #endregion
