@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\InoIPC\InoIPC.csproj" />
+    <ProjectReference Include="..\src\InoIPC.csproj" />
   </ItemGroup>
 
 </Project>

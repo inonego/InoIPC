@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text.Json;
 
 namespace InoIPC
 {
@@ -40,23 +39,11 @@ namespace InoIPC
       // ------------------------------------------------------------
       public static IpcResponse Parse(string json)
       {
-         var response = new IpcResponse { RawJson = json };
-
-         try
+         return new IpcResponse
          {
-            var doc = JsonDocument.Parse(json);
-
-            if (doc.RootElement.TryGetProperty("success", out var success))
-            {
-               response.IsSuccess = success.GetBoolean();
-            }
-         }
-         catch
-         {
-            response.IsSuccess = false;
-         }
-
-         return response;
+            RawJson   = json,
+            IsSuccess = JsonHelper.ParseSuccess(json)
+         };
       }
 
    #endregion
@@ -93,7 +80,7 @@ namespace InoIPC
          return new IpcResponse
          {
             IsSuccess = true,
-            RawJson   = JsonSerializer.Serialize(dict)
+            RawJson   = JsonHelper.Serialize(dict)
          };
       }
 
@@ -118,7 +105,7 @@ namespace InoIPC
          return new IpcResponse
          {
             IsSuccess = true,
-            RawJson   = JsonSerializer.Serialize(dict)
+            RawJson   = JsonHelper.Serialize(dict)
          };
       }
 
@@ -145,7 +132,7 @@ namespace InoIPC
          return new IpcResponse
          {
             IsSuccess = true,
-            RawJson   = JsonSerializer.Serialize(ordered)
+            RawJson   = JsonHelper.Serialize(ordered)
          };
       }
 
@@ -199,7 +186,7 @@ namespace InoIPC
          return new IpcResponse
          {
             IsSuccess = false,
-            RawJson   = JsonSerializer.Serialize(dict)
+            RawJson   = JsonHelper.Serialize(dict)
          };
       }
 

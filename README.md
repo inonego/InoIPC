@@ -5,7 +5,7 @@
   </p>
   <p align="center">
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
-    <img src="https://img.shields.io/badge/.NET-8.0-purple?logo=dotnet" alt=".NET 8.0">
+    <img src="https://img.shields.io/badge/.NET-8.0%20%7C%20Standard%202.1-purple?logo=dotnet" alt=".NET 8.0 | Standard 2.1">
   </p>
   <p align="center">
     <b>English</b> | <a href="README.ko.md">한국어</a>
@@ -20,7 +20,7 @@ Length-prefixed frame protocol over TCP, Named Pipe, and Unix Domain Socket. Tra
 
 ```
 InoIPC/
-├── src/InoIPC/
+├── src/
 │   ├── Transport/          ITransport, IServer
 │   │   ├── Tcp/            TcpTransport, TcpServer
 │   │   ├── NamedPipe/      NamedPipeTransport, NamedPipeServer
@@ -41,7 +41,7 @@ git submodule add https://github.com/inonego/InoIPC.git lib/InoIPC
 
 ```xml
 <ItemGroup>
-  <ProjectReference Include="../lib/InoIPC/src/InoIPC/InoIPC.csproj" />
+  <ProjectReference Include="../lib/InoIPC/src/InoIPC.csproj" />
 </ItemGroup>
 ```
 
@@ -123,17 +123,34 @@ IpcResponse.Parse(json)                           // parse response JSON
 ## JsonHelper
 
 ```csharp
-// Read (from JsonElement)
-JsonHelper.GetInt(element, fallback)
-JsonHelper.GetFloat(element, fallback)
-JsonHelper.GetString(element, fallback)
-JsonHelper.GetBool(element, fallback)
+// Serialize
+JsonHelper.Serialize(dict)                // Dictionary → JSON string
 
-// Write (to console)
+// Parse
+JsonHelper.ParseSuccess(json)             // extract "success" boolean
+
+// Read (from JsonElement on .NET 8+ / JToken on Standard 2.1)
+JsonHelper.GetInt(value, fallback)
+JsonHelper.GetLong(value, fallback)
+JsonHelper.GetFloat(value, fallback)
+JsonHelper.GetDouble(value, fallback)
+JsonHelper.GetString(value, fallback)
+JsonHelper.GetBool(value, fallback)
+
+// Write
 JsonHelper.Write(json, pretty);
 JsonHelper.WriteError(json, pretty);
 JsonHelper.Prettify(json);
 ```
+
+## Compatibility
+
+| Target | Version |
+|--------|---------|
+| .NET | 8.0+ |
+| .NET Standard | 2.1 (Unity 2021+) |
+
+Uses System.Text.Json on .NET 8+, Newtonsoft.Json on .NET Standard 2.1.
 
 ## License
 
