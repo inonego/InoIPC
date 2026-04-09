@@ -5,6 +5,8 @@ using System.Text;
 
 #if NET8_0_OR_GREATER
 using System.Text.Json;
+using System.Text.Encodings;
+using System.Text.Encodings.Web;
 #else
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -428,7 +430,11 @@ namespace InoIPC
       /// </summary>
       // ------------------------------------------------------------
 #if NET8_0_OR_GREATER
-      private static readonly JsonSerializerOptions PrettyOptions = new JsonSerializerOptions { WriteIndented = true };
+      private static readonly JsonSerializerOptions PrettyOptions = new JsonSerializerOptions
+      {
+         WriteIndented = true,
+         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+      };
 #endif
 
       public static string Prettify(string json)
